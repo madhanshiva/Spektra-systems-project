@@ -1,4 +1,4 @@
-# HTTP-Triggered Email Workflow Using Azure Logic App
+# Design and Deploy a Serverless API Ecosystem on Azure using Azure Functions and API Management
 
 ## Overview
 
@@ -28,18 +28,12 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
 4. If prompted to stay signed in , click **NO**
 
-5. ## Prerequisites
-
-  - An Azure account with an active subscription. [Create/Login Azure account](https://portal.azure.com/#home)
-
-## Getting Started With Lab
-
 1. Clone the git repository
 
-   ``
+   ```
    git clone
 
-   ``
+   ```
 2. Click on the cloud shell and paste the git url and press enter
 
 3. Follow the below details
