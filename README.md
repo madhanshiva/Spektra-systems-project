@@ -34,3 +34,27 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
 ## Getting Started With Lab
 
+1. Clone the git repository
+
+   ``
+   git clone
+
+   ``
+2. Click on the cloud shell and paste the git url and press enter
+
+3. Follow the below details
+
+   ```
+   cd Spektra-systems-project/ARM/AZURE-MONITOR
+   az deployment group validate --resource-group shiva.kumarmv --template-file arm-monitor.json --parameters arm-monitor-param.json
+    ```
+
+4. Once the deployment completed back to root folder and execute the below command
+
+   ```
+   cd Spektra-systems-project/ARM/AZURE-FUNCTION-API
+   az deployment group validate --resource-group shiva.kumarmv --template-file azure-function-api-param.json --parameters azure-function.json
+   ```
+
+5. 
+   
