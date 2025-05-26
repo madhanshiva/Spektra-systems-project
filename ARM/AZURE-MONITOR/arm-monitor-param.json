@@ -1,0 +1,45 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "securitygroup": {
+            "value": "vm-nsg"
+        },
+        "vmpip": {
+            "value": "linuxpip"
+        },
+        "vmSize": {
+            "value": "Standard_D2s_v3"
+        },
+        "adminUsername": {
+            "value": "azureuser"
+        },
+        "adminPublicKey": {
+            "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC... [your SSH public key here]"
+        },
+        "vmName": {
+            "value": "linuxvm"
+        },
+        "vNetAddressPrefix": {
+            "value": "10.0.0.0/16"
+        },
+        "subnetAddressPrefix": {
+            "value": "10.0.0.0/24"
+        },
+        "vmdnsname": {
+            "value": "linuxmadhan"
+        },
+        "actionGroupName": {
+            "value": "cpuAlertActionGroup"
+        },
+        "alertRuleName": {
+            "value": "HighCPUAlert"
+        },
+        "logicAppName": {
+            "value": "IncidentCreatorLogicApp"
+        },
+        "apiManagementSubscriptionKey": {
+            "value": "0f8db161ce0a429f82e354dcf96aa15f"
+        }
+    }
+}
