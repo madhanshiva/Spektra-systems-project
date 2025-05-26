@@ -1,0 +1,244 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "defaultValue": "[resourceGroup().location]",
+            "type": "String"
+        },
+        "functionAppName": {
+            "type": "String"
+        },
+        "storageAccountName": {
+            "type": "String"
+        },
+        "appServicePlanName": {
+            "type": "String"
+        },
+        "logAnalyticsWorkspaceName": {
+            "type": "String"
+        },
+        "linuxFxVersion": {
+            "defaultValue": "Python|3.11",
+            "type": "String"
+        },
+        "functionRuntimeVersion": {
+            "defaultValue": "~4",
+            "type": "String"
+        },
+        "functionAppZipUrl": {
+            "defaultValue": "https://hostingstorg.blob.core.windows.net/functionappcode/Final-Project-Azure-Fixed.zip",
+            "type": "String"
+        },
+        "apiManagementName": {
+            "type": "String"
+        },
+        "apiManagementPublisherEmail": {
+            "type": "String"
+        },
+        "apiManagementPublisherName": {
+            "type": "String"
+        }
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2023-01-01",
+            "name": "[parameters('storageAccountName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "StorageV2",
+            "properties": {
+                "allowBlobPublicAccess": false,
+                "minimumTlsVersion": "TLS1_2"
+            }
+        },
+        {
+            "type": "Microsoft.OperationalInsights/workspaces",
+            "apiVersion": "2021-06-01",
+            "name": "[parameters('logAnalyticsWorkspaceName')]",
+            "location": "[parameters('location')]",
+            "properties": {
+                "sku": {
+                    "name": "PerGB2018"
+                },
+                "retentionInDays": 30
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('appServicePlanName')]",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic"
+            },
+            "kind": "linux",
+            "properties": {
+                "reserved": true
+            }
+        },
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "2020-02-02",
+            "name": "[parameters('functionAppName')]",
+            "location": "[parameters('location')]",
+            "tags": {
+                "hidden-link:/subscriptions/[subscription().subscriptionId]/resourceGroups/[resourceGroup().name]/providers/Microsoft.Web/sites/[parameters('functionAppName')]": "Resource"
+            },
+            "properties": {
+                "Application_Type": "web",
+                "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('logAnalyticsWorkspaceName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2022-03-01",
+            "name": "[parameters('functionAppName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]",
+                "[resourceId('Microsoft.Insights/components', parameters('functionAppName'))]"
+            ],
+            "kind": "functionapp,linux",
+            "properties": {
+                "siteConfig": {
+                    "linuxFxVersion": "[parameters('linuxFxVersion')]",
+                    "appSettings": [
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "[parameters('functionRuntimeVersion')]"
+                        },
+                        {
+                            "name": "WEBSITE_RUN_FROM_PACKAGE",
+                            "value": "[parameters('functionAppZipUrl')]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2023-01-01').keys[0].value)]"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('functionAppName'))).ConnectionString]"
+                        }
+                    ]
+                },
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service",
+            "apiVersion": "2021-08-01",
+            "name": "[parameters('apiManagementName')]",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+            ],
+            "sku": {
+                "name": "Developer",
+                "capacity": 1
+            },
+            "properties": {
+                "publisherEmail": "[parameters('apiManagementPublisherEmail')]",
+                "publisherName": "[parameters('apiManagementPublisherName')]"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products",
+            "apiVersion": "2021-08-01",
+            "name": "[concat(parameters('apiManagementName'), '/Internal-Product')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagementName'))]"
+            ],
+            "properties": {
+                "displayName": "Internal Product",
+                "description": "For internal APIs",
+                "subscriptionRequired": true,
+                "approvalRequired": false,
+                "subscriptionsLimit": 10,
+                "state": "published"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/products",
+            "apiVersion": "2021-08-01",
+            "name": "[concat(parameters('apiManagementName'), '/External-Product')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service', parameters('apiManagementName'))]"
+            ],
+            "properties": {
+                "displayName": "External Product",
+                "description": "For external APIs",
+                "subscriptionRequired": true,
+                "approvalRequired": true,
+                "subscriptionsLimit": 10,
+                "state": "published"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/subscriptions",
+            "apiVersion": "2021-08-01",
+            "name": "[concat(parameters('apiManagementName'), '/Internal-key')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagementName'), 'Internal-Product')]"
+            ],
+            "properties": {
+                "displayName": "Internal Subscription",
+                "scope": "[concat('/products/Internal-Product')]",
+                "primaryKey": "[guid(resourceGroup().id, 'internalKey')]",
+                "secondaryKey": "[guid(resourceGroup().id, 'internalKey2')]",
+                "state": "active"
+            }
+        },
+        {
+            "type": "Microsoft.ApiManagement/service/subscriptions",
+            "apiVersion": "2021-08-01",
+            "name": "[concat(parameters('apiManagementName'), '/External-key')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.ApiManagement/service/products', parameters('apiManagementName'), 'External-Product')]"
+            ],
+            "properties": {
+                "displayName": "External Subscription",
+                "scope": "[concat('/products/External-Product')]",
+                "primaryKey": "[guid(resourceGroup().id, 'externalKey')]",
+                "secondaryKey": "[guid(resourceGroup().id, 'externalKey2')]",
+                "state": "active"
+            }
+        },
+        {
+            "type": "Microsoft.CognitiveServices/accounts",
+            "apiVersion": "2023-05-01",
+            "name": "openai-service",
+            "location": "[parameters('location')]",
+            "sku": {
+                "name": "S0"
+            },
+            "kind": "OpenAI",
+            "properties": {
+                "networkAcls": {
+                    "defaultAction": "Allow",
+                    "virtualNetworkRules": [],
+                    "ipRules": []
+                }
+            }
+        }
+    ],
+    "outputs": {
+        "functionAppEndpoint": {
+            "type": "String",
+            "value": "[reference(resourceId('Microsoft.Web/sites', parameters('functionAppName'))).defaultHostName]"
+        }
+    }
+}
