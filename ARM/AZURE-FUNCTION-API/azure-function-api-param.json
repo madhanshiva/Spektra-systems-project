@@ -1,0 +1,39 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "westeurope"
+    },
+    "functionAppName": {
+      "value": "ticketfun580"
+    },
+    "storageAccountName": {
+      "value": "ticketstg5809"
+    },
+    "appServicePlanName": {
+      "value": "tikcetplan9892"
+    },
+    "logAnalyticsWorkspaceName": {
+      "value": "ticketanalytics"
+    },
+    "linuxFxVersion": {
+      "value": "Python|3.11"
+    },
+    "functionRuntimeVersion": {
+      "value": "~4"
+    },
+    "functionAppZipUrl": {
+      "value": "https://hostingstorg.blob.core.windows.net/functionappcode/Final-Project-Azure-Fixed.zip"
+    },
+    "apiManagementName": {
+      "value": "api-ticket-service"
+    },
+    "apiManagementPublisherEmail": {
+      "value": "admin@example.com"
+    },
+    "apiManagementPublisherName": {
+      "value": "API Team"
+    }
+  }
+}
