@@ -1,0 +1,370 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "securitygroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the network security group"
+            },
+            "defaultValue": "vm-nsg"
+        },
+        "vmpip": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the public IP address"
+            },
+            "defaultValue": "linuxpip"
+        },
+        "vmSize": {
+            "type": "string",
+            "metadata": {
+                "description": "Size of the virtual machine"
+            },
+            "defaultValue": "Standard_D2s_v3"
+        },
+        "adminUsername": {
+            "type": "string",
+            "metadata": {
+                "description": "Admin username for the virtual machine"
+            },
+            "defaultValue": "azureuser"
+        },
+        "adminPublicKey": {
+            "type": "string",
+            "metadata": {
+                "description": "SSH public key for the virtual machine"
+            }
+        },
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the virtual machine"
+            },
+            "defaultValue": "linuxvm"
+        },
+        "vNetAddressPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Address prefix for the virtual network"
+            },
+            "defaultValue": "10.0.0.0/16"
+        },
+        "subnetAddressPrefix": {
+            "type": "string",
+            "metadata": {
+                "description": "Address prefix for the subnet"
+            },
+            "defaultValue": "10.0.0.0/24"
+        },
+        "vmdnsname": {
+            "type": "string",
+            "metadata": {
+                "description": "description"
+            },
+            "defaultValue": "linuxmadhan"
+        },
+        "actionGroupName": {
+            "type": "string",
+            "defaultValue": "cpuAlertActionGroup",
+            "metadata": {
+                "description": "Name for the action group"
+            }
+        },
+        "alertRuleName": {
+            "type": "string",
+            "defaultValue": "HighCPUAlert",
+            "metadata": {
+                "description": "Name for the alert rule"
+            }
+        },
+        "logicAppName": {
+            "type": "string",
+            "defaultValue": "IncidentCreatorLogicApp",
+            "metadata": {
+                "description": "Name for the logic app"
+            }
+        },
+        "apiManagementSubscriptionKey": {
+            "type": "securestring",
+            "defaultValue": "0f8db161ce0a429f82e354dcf96aa15f",
+            "metadata": {
+                "description": "Subscription key for API Management"
+            }
+        }
+    },
+    "functions": [],
+    "variables": {
+        "networkSecurityGroupName": "[parameters('securitygroup')]",
+        "pipName": "[parameters('vmpip')]",
+        "vNetName": "[concat(parameters('vmName'), '-vnet')]",
+        "vNetSubnetName": "[concat(parameters('vmName'), '-subnet')]",
+        "vNetAddressPrefixes": "[parameters('vNetAddressPrefix')]",
+        "vNetSubnetAddressPrefix": "[parameters('subnetAddressPrefix')]",
+        "networkInterfaceName": "[concat(parameters('vmName'), '-nic')]",
+        "vmName": "[parameters('vmName')]",
+        "publicdnsName": "[parameters('vmdnsname')]",
+        "actionGroupName": "[parameters('actionGroupName')]",
+        "alertRuleName": "[parameters('alertRuleName')]",
+        "logicAppName": "[parameters('logicAppName')]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "apiVersion": "2024-03-01",
+            "name": "[variables('networkSecurityGroupName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "ssh_rule",
+                        "properties": {
+                            "description": "Locks inbound down to ssh default port 22.",
+                            "protocol": "Tcp",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "22",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 123,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/publicIPAddresses",
+            "apiVersion": "2024-03-01",
+            "name": "[variables('pipName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "dnsSettings": {
+                    "domainNameLabel": "[parameters('vmdnsname')]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Network/virtualNetworks",
+            "apiVersion": "2024-03-01",
+            "name": "[variables('vNetName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "[variables('vNetAddressPrefixes')]"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "[variables('vNetSubnetName')]",
+                        "properties": {
+                            "addressPrefix": "[variables('vNetSubnetAddressPrefix')]"
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            "type": "Microsoft.Network/networkInterfaces",
+            "apiVersion": "2024-03-01",
+            "name": "[variables('networkInterfaceName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+            ],
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('pipName'))]"
+                            },
+                            "subnet": {
+                                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', variables('vNetName'), variables('vNetSubnetName'))]"
+                            }
+                        }
+                    }
+                ],
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSecurityGroupName'))]"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2024-07-01",
+            "name": "[variables('vmName')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[variables('vmName')]",
+                    "adminUsername": "[parameters('adminUsername')]",
+                    "linuxConfiguration": {
+                        "disablePasswordAuthentication": true,
+                        "ssh": {
+                            "publicKeys": [
+                                {
+                                    "path": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
+                                    "keyData": "[parameters('adminPublicKey')]"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "Canonical",
+                        "offer": "0001-com-ubuntu-server-jammy",
+                        "sku": "22_04-lts-gen2",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "createOption": "FromImage"
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[variables('logicAppName')]",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {},
+                    "triggers": {
+                        "When_a_HTTP_request_is_received": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "method": "POST",
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "actions": {
+                        "HTTP": {
+                            "type": "Http",
+                            "inputs": {
+                                "method": "POST",
+                                "uri": "https://my-api-management-dev.azure-api.net/v2/create-incident",
+                                "headers": {
+                                    "Content-Type": "application/json",
+                                    "Ocp-Apim-Subscription-Key": "[parameters('apiManagementSubscriptionKey')]"
+                                },
+                                "body": {
+                                    "short_description": "app logic is working and vm cpu is not sending cpu alert"
+                                }
+                            },
+                            "runAfter": {}
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {}
+            }
+        },
+        {
+            "type": "microsoft.insights/actionGroups",
+            "apiVersion": "2023-01-01",
+            "name": "[variables('actionGroupName')]",
+            "location": "global",
+            "properties": {
+                "groupShortName": "cpuAlert",
+                "enabled": true,
+                "emailReceivers": [],
+                "smsReceivers": [],
+                "webhookReceivers": [
+                    {
+                        "name": "LogicAppAction",
+                        "serviceUri": "[listCallbackURL(resourceId('Microsoft.Logic/workflows/triggers', variables('logicAppName'), 'When_a_HTTP_request_is_received'), '2017-07-01').value]",
+                        "useCommonAlertSchema": true
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows', variables('logicAppName'))]"
+            ]
+        },
+        {
+            "type": "microsoft.insights/metricAlerts",
+            "apiVersion": "2018-03-01",
+            "name": "[variables('alertRuleName')]",
+            "location": "global",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]",
+                "[resourceId('microsoft.insights/actionGroups', variables('actionGroupName'))]"
+            ],
+            "properties": {
+                "description": "Alert when CPU exceeds 60%",
+                "severity": 2,
+                "enabled": true,
+                "scopes": [
+                    "[resourceId('Microsoft.Compute/virtualMachines', variables('vmName'))]"
+                ],
+                "evaluationFrequency": "PT1M",
+                "windowSize": "PT5M",
+                "criteria": {
+                    "odata.type": "Microsoft.Azure.Monitor.SingleResourceMultipleMetricCriteria",
+                    "allOf": [
+                        {
+                            "name": "HighCPU",
+                            "metricName": "Percentage CPU",
+                            "metricNamespace": "Microsoft.Compute/virtualMachines",
+                            "operator": "GreaterThan",
+                            "threshold": 60,
+                            "timeAggregation": "Average",
+                            "criterionType": "StaticThresholdCriterion"
+                        }
+                    ]
+                },
+                "actions": [
+                    {
+                        "actionGroupId": "[resourceId('microsoft.insights/actionGroups', variables('actionGroupName'))]"
+                    }
+                ],
+                "autoMitigate": true
+            }
+        }
+    ],
+    "outputs": {
+        "adminUsername": {
+            "type": "string",
+            "value": "[parameters('adminUsername')]"
+        },
+        "vmName": {
+            "type": "string",
+            "value": "[variables('vmName')]"
+        },
+        "dnsname": {
+            "type": "string",
+            "value": "[reference(resourceId('Microsoft.Network/publicIPAddresses', variables('pipName')), '2024-03-01').dnsSettings.fqdn]"
+        },
+        "logicAppCallbackUrl": {
+            "type": "string",
+            "value": "[listCallbackURL(resourceId('Microsoft.Logic/workflows/triggers', variables('logicAppName'), 'When_a_HTTP_request_is_received'), '2017-07-01').value]"
+        }
+    }
+}
