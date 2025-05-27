@@ -50,5 +50,30 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
    az deployment group validate --resource-group shiva.kumarmv --template-file azure-function-api-param.json --parameters azure-function.json
    ```
 
-5. 
+5. Verfiy all services present in the resource group.
+
+   ![image](images/2.png)
+
+6. Click on the openai-service it takes to Azure openai home page.
    
+   ![image](images/2.png)
+
+7. On overview of azure openai on top click on **Go to azure AI Foundry Portal** it takes to new tab.
+9. 
+
+10. Under model deployment click on + button and select **Deploy base mobel**
+
+
+11. On left search bar type **gpt-4o** , scroll down and select and click confirm.
+
+12. Fill the following deployment details and click on deploy.
+
+    Deployment name : gtp-4o-deployment
+    Deployment type : global Standard
+    Model version : default
+    Tokens : 10k
+     
+
+13. once deployment is done copy the Endpoint and Key and paste in notepad later we will use.
+
+     
