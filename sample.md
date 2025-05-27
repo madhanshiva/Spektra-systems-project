@@ -108,11 +108,11 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
     | Model Version              | 2024-08-06 (Default)         |
     | Tokens per Minute Limit    | 10K                          |
   
-  - Click *Deploy* to complete the deployment process.
+    - Click *Deploy* to complete the deployment process.
 
     ![image](images/7.png)
 
-  > Once deployed, you can use this model via endpoint and key in your apps.
+    > Once deployed, you can use this model via endpoint and key in your apps.
 
 
 14. Get Your OpenAI Endpoint and Key
@@ -120,9 +120,9 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
     - *Target URI*: Copy the endpoint URL for use in your application.
     - *Key*: Click the copy icon next to the key to use it for authentication.
   
-    ![image](images/8.png)
+      ![image](images/8.png)
 
-    > *Important:* Keep your key secure and do not expose it publicly.
+      > *Important:* Keep your key secure and do not expose it publicly.
 
 16. View Function App (ticketfun58098)
 
@@ -150,7 +150,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
       ![image](images/11.png)
 
-      > Importanat : Do it for AZURE_OPENAI_KEY as well
+        > Importanat : Do it for AZURE_OPENAI_KEY as well
 
 19. Save the New App Setting
 
