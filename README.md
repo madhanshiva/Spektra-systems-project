@@ -34,10 +34,10 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
    git clone https://github.com/madhanshiva/Spektra-systems-project.git
 
    ```
+   
+2. Click on the cloud shell and paste the git url and press enter.
 
    ![image](images/1.png)
-   
-2. Click on the cloud shell and paste the git url and press enter
 
 3. Follow the below details
 
