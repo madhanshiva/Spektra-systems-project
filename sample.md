@@ -37,21 +37,15 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
     git clone https://github.com/madhanshiva/Spektra-systems-project.git
     ```
     ![image](images/1.png)
-   
-6. Follow the below details
+  
 
-   ```
-   cd Spektra-systems-project/ARM/AZURE-MONITOR
-   az deployment group validate --resource-group shiva.kumarmv --template-file arm-monitor.json --parameters arm-monitor-param.json
-   ```
-
-7. Once the deployment completed back to root folder and execute the below command
+6. Execute the below commands in the cloud shell.
 
    ```
    cd Spektra-systems-project/ARM/AZURE-FUNCTION-API
    az deployment group validate --resource-group shiva.kumarmv --template-file azure-function-api-param.json --parameters azure-function.json
    ```
-8. View Azure Resource Group & Resources
+7. View Azure Resource Group & Resources
 
     - Open Resource Group
 
@@ -70,11 +64,11 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
     ![image](images/2.png)
     
-9. Open Azure OpenAI Resource
+8. Open Azure OpenAI Resource
 
     - In the resource group view, click on *openai-service* (Type: Azure OpenAI).
 
-10. Open Azure AI Foundry Portal
+9. Open Azure AI Foundry Portal
 
     ![image](images/3.png)
   
@@ -83,14 +77,14 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
     ![image](images/4.png)
 
 
-11. Start a New OpenAI Model Deployment
+10. Start a New OpenAI Model Deployment
 
     - In the *Model deployments* tab, click *➕ Deploy model*.
     - From the dropdown, select *Deploy base model*.
 
       ![image](images/5.png)
       
-12. Select GPT-4o Model
+11. Select GPT-4o Model
 
     - In the search bar, type gpt-4o.
     - Select the *gpt-4o* model with the *Chat completion* task.
@@ -99,7 +93,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
       ![image](images/6.png)
 
 
-13. Final Steps to Deploy GPT-4o Model
+12. Final Steps to Deploy GPT-4o Model
   
     | Setting                    | Value                        |
     |----------------------------|------------------------------|
@@ -115,7 +109,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
     > Once deployed, you can use this model via endpoint and key in your apps.
 
 
-14. Get Your OpenAI Endpoint and Key
+13. Get Your OpenAI Endpoint and Key
   
     - *Target URI*: Copy the endpoint URL for use in your application.
     - *Key*: Click the copy icon next to the key to use it for authentication.
@@ -124,7 +118,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
       > *Important:* Keep your key secure and do not expose it publicly.
 
-16. View Function App (ticketfun58098)
+14. View Function App (ticketfun58098)
 
     - Go to *Resource Group: shiva.kumarmv*.
     - Scroll and find *ticketfun58098* with the ⚡ Function App icon.
@@ -133,7 +127,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
       ![image](images/9f.png)
 
 
-17. Add an Environment Variable in Function App
+15. Add an Environment Variable in Function App
 
     - Expand the *Settings* section.
     - Click on *Environment variables*.
@@ -142,7 +136,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
       ![image](images/10.png)
 
-18. Add Azure OpenAI Endpoint Variable
+16. Add Azure OpenAI Endpoint Variable
 
     - *Name*: AZURE_OPENAI_ENDPOINT  
     - *Value*: Paste your OpenAI endpoint URL  
@@ -152,7 +146,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
         > Importanat : Do it for AZURE_OPENAI_KEY as well
 
-19. Save the New App Setting
+17. Save the New App Setting
 
     - After adding the variable, click *Apply* again at the bottom.
     - In the popup, click *Confirm* to save changes.
@@ -161,7 +155,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
     
     > The app may restart after applying changes.
 
-20. Add a New API in API Management
+18. Add a New API in API Management
 
     - Go to *api-ticket-services5* (API Management).
     - Expand the *APIs* section.
@@ -169,13 +163,13 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
       ![image](images/13.png)
 
-21. Import Function App as an API
+19. Import Function App as an API
 
     - Under *Create from Azure resource, select the **Function App* tile.
 
       ![image](images/14.png)
 
-22. Link a Function App to API Management
+20. Link a Function App to API Management
 
     - Click *Browse*.
     - Select ticketfun58098 from the list.
@@ -186,14 +180,14 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
       
 
 
-24. Select Your Function App
+21. Select Your Function App
 
     - Click on *ticketfun58098* from the list.
     - Click *Select* at the bottom to confirm.
    
       ![image](images/17.png)
       
-23. Finalize Function App Selection
+22. Finalize Function App Selection
 
     - After choosing your Function App, click *Select* to load available endpoints.
    
@@ -211,7 +205,7 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
     
 
-22. Create the API from Function App
+24. Create the API from Function App
 
     - In *API URL suffix*, enter: v1
     - Click *Create* to publish the API.
@@ -220,5 +214,3 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
        
       >  Your API will now be accessible at:  
       > https://api-ticket-services5.azure-api.net/v1
-
----
