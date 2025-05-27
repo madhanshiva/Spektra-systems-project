@@ -31,9 +31,12 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 1. Clone the git repository
 
    ```
-   git clone
+   git clone https://github.com/madhanshiva/Spektra-systems-project.git
 
    ```
+
+   ![image](images/1.png)
+   
 2. Click on the cloud shell and paste the git url and press enter
 
 3. Follow the below details
@@ -56,24 +59,33 @@ To design and deploy a secure, scalable, and maintainable serverless API ecosyst
 
 6. Click on the openai-service it takes to Azure openai home page.
    
-   ![image](images/2.png)
+   ![image](images/3.png)
 
 7. On overview of azure openai on top click on **Go to azure AI Foundry Portal** it takes to new tab.
-9. 
 
-10. Under model deployment click on + button and select **Deploy base mobel**
+   ![image](images/4.png)
+
+8. Under model deployment click on + button and select **Deploy base mobel**
+
+    ![image](images/5.png)
 
 
-11. On left search bar type **gpt-4o** , scroll down and select and click confirm.
+9. On left search bar type **gpt-4o** , scroll down and select and click confirm.
 
-12. Fill the following deployment details and click on deploy.
+    ![image](images/6.png)
+
+10. Fill the following deployment details and click on deploy.
 
     Deployment name : gtp-4o-deployment
     Deployment type : global Standard
     Model version : default
     Tokens : 10k
+
+    ![image](images/7.png)
      
 
-13. once deployment is done copy the Endpoint and Key and paste in notepad later we will use.
+11. once deployment is done copy the Endpoint and Key and paste in notepad later we will use.
+
+    ![image](images/8.png)
 
      
